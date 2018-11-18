@@ -4,12 +4,15 @@ Based on the paper [DeepLab: Semantic Image Segmentation with Deep Convolutional
 
 __Note: For now only VGG-16 encoder is implemented.__
 
+__Note2: Weights are stored in the repository using GitLFS. Therefore - it may take some time to clone this repo.__
+
 Code is based on the repository [DavideA/deeplabv2-keras](https://github.com/DavideA/deeplabv2-keras), which was implemented using Theano backend.
 
 ### How to use
 Execute `python testing.py` (Input image is defined in the testing.py, so edit it to use different image).
 
 ### Requirements (Tested on those versions)
+Python==2.7.12
 Keras==2.2.4  
 tensorflow==1.9.0  
 CUDA==9.0.176   
