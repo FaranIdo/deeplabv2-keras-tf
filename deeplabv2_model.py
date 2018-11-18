@@ -3,7 +3,6 @@
 
 # Based on: https://github.com/DavideA/deeplabv2-keras/blob/master/predict.py
 
-from keras import backend as K
 from tensorflow import image
 
 from keras.models import Model
@@ -38,39 +37,12 @@ def DeeplabV2(input_shape,
             upsampling=8,
             apply_softmax=True,
             load_weights=True,
-            input_tensor=None,
             classes=VOC2012_CLASSES_COUNT):
-
-    """Instantiate the DeeplabV2 architecture with VGG16 encoder,
-    optionally loading weights pre-trained on VOC2012 segmentation.
-    # Arguments
-        input_shape: shape tuple. It should have exactly 3 inputs channels,
-            and the axis ordering should be coherent with what specified in
-            your keras.json (e.g. use (3, 512, 512) for 'th' and (512, 512, 3)
-            for 'tf').
-        upsampling: final front end upsampling (default is 8x).
-        apply_softmax: whether to apply softmax or return logits.
-        weights: one of `None` (random initialization)
-            or `voc2012` (pre-training on VOC2012 segmentation).
-        input_tensor: optional Keras tensor (i.e. output of `layers.Input()`)
-            to use as image input for the model.
-        classes: optional number of classes to classify images
-            into, only to be specified if `include_top` is True, and
-            if no `weights` argument is specified.
-    # Returns
-        A Keras model instance.
-    """
-
+    
     if load_weights and classes != VOC2012_CLASSES_COUNT:
         raise ValueError('For using existing weights - `classes` should be 21')
 
-    if input_tensor is None:
-        img_input = Input(shape=input_shape)
-    else:
-        if not K.is_keras_tensor(input_tensor):
-            img_input = Input(tensor=input_tensor, shape=input_shape)
-        else:
-            img_input = input_tensor
+    img_input = Input(shape=input_shape)
 
     # Block 1
     h = ZeroPadding2D(padding=(1, 1))(img_input)
@@ -159,15 +131,7 @@ def DeeplabV2(input_shape,
     else:
         out = logits
 
-    # Ensure that the model takes into account
-    # any potential predecessors of `input_tensor`.
-    # if input_tensor is not None:
-    #     inputs = get_source_inputs(input_tensor)
-    # else:
-    #     inputs = img_input
-    inputs = img_input
-
-    model = Model(inputs, out, name='deeplabV2')
+    model = Model(img_input, out, name='deeplabV2')
     model.load_weights(WEIGHTS_PATH)
 
     return model
