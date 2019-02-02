@@ -28,6 +28,12 @@ class BilinearUpsampling(Layer):
         output = image.resize_images(x, new_size)
         return output
 
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0],
+                input_shape[1] * self.upsampling,
+                input_shape[2] * self.upsampling,
+                input_shape[3])
+
 
 WEIGHTS_PATH = 'deeplabV2_weights_tf.h5'
 VOC2012_CLASSES_COUNT = 21
