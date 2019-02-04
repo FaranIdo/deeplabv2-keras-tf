@@ -3,36 +3,9 @@
 
 # Based on: https://github.com/DavideA/deeplabv2-keras/blob/master/predict.py
 
-from tensorflow import image
 
 from keras.models import Model
-from keras.layers import Input, Conv2D, MaxPooling2D, Add, ZeroPadding2D, Dropout, Layer, Activation
-
-
-class BilinearUpsampling(Layer):
-    '''A simple bilinear upsampling layer.
-    # Arguments
-        upsampling: Integer > 0. The upsampling ratio for height and weight.
-        name: the name of the layer
-    '''
-    def __init__(self, upsampling, name='', **kwargs):
-        self.name = name
-        self.upsampling = upsampling
-        super(BilinearUpsampling, self).__init__(**kwargs)
-
-    def build(self, input_shape):
-        super(BilinearUpsampling, self).build(input_shape)
-
-    def call(self, x, mask=None):
-        new_size = [x.shape[1] * self.upsampling, x.shape[2] * self.upsampling]
-        output = image.resize_images(x, new_size)
-        return output
-
-    def compute_output_shape(self, input_shape):
-        return (input_shape[0],
-                input_shape[1] * self.upsampling,
-                input_shape[2] * self.upsampling,
-                input_shape[3])
+from keras.layers import Input, Conv2D, MaxPooling2D, Add, ZeroPadding2D, Dropout, Activation, UpSampling2D
 
 
 WEIGHTS_PATH = 'deeplabV2_weights_tf.h5'
@@ -130,7 +103,7 @@ def DeeplabV2(input_shape,
     b4 = Conv2D(filters=21, kernel_size=(1, 1), activation='relu', name='fc8_voc12_4')(b4)
 
     s = Add()([b1, b2, b3, b4])
-    logits = BilinearUpsampling(upsampling=upsampling)(s)
+    logits = UpSampling2D(size=upsampling, interpolation='bilinear')(s)
     
     if apply_softmax:
         out = Activation('softmax')(logits)
